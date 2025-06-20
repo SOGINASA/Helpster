@@ -27,40 +27,45 @@
   <main class="flex-grow flex items-center justify-center py-12 px-6">
     <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-8">
       <h2 class="text-2xl font-semibold text-center mb-6">Регистрация</h2>
-      <form class="space-y-4">
+      <form class="space-y-4" action="/auth/register" method="POST">
+        <div>
+          <label for="login" class="block text-sm font-medium mb-1">Login</label>
+          <input id="login" name="login" type="text" placeholder="login"
+            class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
         <div>
           <label for="full-name" class="block text-sm font-medium mb-1">ФИО</label>
-          <input id="full-name" type="text" placeholder="Иванов Иван Иванович"
+          <input id="full-name" name="full_name" type="text" placeholder="Иванов Иван Иванович"
             class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
         <div>
           <label for="phone" class="block text-sm font-medium mb-1">Телефон</label>
-          <input id="phone" type="tel" placeholder="+7 (777) 123-45-67"
+          <input id="phone" name="phone" type="tel" placeholder="+7 (777) 123-45-67"
             class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
         <div>
           <label for="email" class="block text-sm font-medium mb-1">Адрес электронной почты</label>
-          <input id="email" type="email" placeholder="you@example.com"
+          <input id="email" name="email" type="email" placeholder="you@example.com"
             class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
         <div>
           <label for="iin" class="block text-sm font-medium mb-1">ИИН</label>
-          <input id="iin" type="text" maxlength="12" placeholder="123456789012"
+          <input id="iin" name="iin" type="text" maxlength="12" placeholder="123456789012"
             class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
         <div>
           <label for="password" class="block text-sm font-medium mb-1">Пароль</label>
-          <input id="password" type="password" placeholder="••••••••"
+          <input id="password" name="password" type="password" placeholder="••••••••"
             class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
         <div>
           <label for="confirm-password" class="block text-sm font-medium mb-1">Повторить пароль</label>
-          <input id="confirm-password" type="password" placeholder="••••••••"
+          <input id="confirm-password" name="confirm_password" type="password" placeholder="••••••••"
             class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
         <div>
           <label for="city" class="block text-sm font-medium mb-1">Город проживания</label>
-          <input id="city" type="text" placeholder="Алматы"
+          <input id="city" name="city" type="text" placeholder="Алматы"
             class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
         </div>
         <button type="submit"
@@ -70,7 +75,7 @@
       </form>
       <p class="mt-6 text-center text-sm text-gray-500">
         Уже зарегистрированы?
-        <a href="login.html" class="text-indigo-600 hover:underline">Войти</a>
+        <a href="/auth/login" class="text-indigo-600 hover:underline">Войти</a>
       </p>
     </div>
   </main>

@@ -7,7 +7,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Локальные стили -->
-  <link rel="stylesheet" href="../styless/main.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
   <!-- Шрифт Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
 </head>
@@ -73,40 +73,40 @@
   <nav class="fixed inset-x-0 bottom-8 flex justify-center pointer-events-none">
     <div class="bg-white bg-opacity-90 backdrop-blur-lg rounded-full px-8 py-3 flex space-x-8 pointer-events-auto">
       <!-- Главная (активная всегда подсвечена) -->
-      <button class="flex flex-col items-center text-indigo-600">
+      <a class="flex flex-col items-center text-indigo-600" href="#dashboard">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
         </svg>
         <span class="text-xs font-semibold">Главная</span>
-      </button>
+      </a>
       <!-- Мои события -->
-      <button class="flex flex-col items-center text-gray-600 hover:text-indigo-600">
+      <a class="flex flex-col items-center text-gray-600 hover:text-indigo-600" href="#my-events">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
         </svg>
         <span class="text-xs">Мои события</span>
-      </button>
-      <!-- Сертификаты -->
-      <button class="flex flex-col items-center text-gray-600 hover:text-indigo-600">
+      </a>
+      <!-- чатбот -->
+      <a class="flex flex-col items-center text-gray-600 hover:text-indigo-600" href="#chatbot">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 14l9-5-9-5-9 5 9 5zm0 0v7m9-12v5m-18-5v5m18 0l-9 5-9-5"/>
         </svg>
-        <span class="text-xs">Сертификаты</span>
-      </button>
+        <span class="text-xs">чатбот</span>
+      </a>
       <!-- Профиль -->
-      <button class="flex flex-col items-center text-gray-600 hover:text-indigo-600">
+      <a class="flex flex-col items-center text-gray-600 hover:text-indigo-600" href="#profile">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M5 13a4 4 0 118 0 4 4 0 01-8 0zm0 0v4m0 0h4m-4 0H1"/>
         </svg>
         <span class="text-xs">Профиль</span>
-      </button>
+      </a>
     </div>
   </nav>
 
-  <script src="main.js" defer></script>
+  <script src="{{ url_for('static', filename='main.js') }}" defer></script>
 </body>
 </html>
