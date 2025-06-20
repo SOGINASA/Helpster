@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Helpster — Профиль</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Локальные стили -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />  
+  <!-- Шрифт Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-6 py-6 flex justify-center">
+      <h1 class="text-3xl font-extrabold text-indigo-600">Helpster</h1>
+    </div>
+  </header>
+
+  <!-- Main Profile Content -->
+  <main class="flex-grow container mx-auto px-6 py-10">
+    <!-- Profile Overview -->
+    <section class="bg-white rounded-3xl shadow p-6 mb-8 flex flex-col items-center">
+      <img src="https://i.pravatar.cc/150" alt="Аватар" class="w-32 h-32 rounded-full mb-4">
+      <h2 id="profile-name" class="text-2xl font-semibold mb-2">Иванов Иван Иванович</h2>
+      <button id="edit-toggle" class="mt-2 px-6 py-2 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition">
+        Изменить данные
+      </button>
+    </section>
+
+    <!-- Edit Form -->
+    <section id="edit-form" class="hidden bg-white rounded-3xl shadow p-6 mb-8">
+      <h3 class="text-xl font-semibold mb-4">Редактирование данных</h3>
+      <form id="profile-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">ФИО</label>
+          <input id="edit-fullname" type="text" value="Иванов Иван Иванович"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Телефон</label>
+          <input id="edit-phone" type="tel" value="+7 (777) 123-45-67"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Email</label>
+          <input id="edit-email" type="email" value="ivanov@example.com"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">ИИН</label>
+          <input id="edit-iin" type="text" maxlength="12" value="123456789012"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Город</label>
+          <input id="edit-city" type="text" value="Алматы"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+        </div>
+        <div class="flex justify-end">
+          <button type="button" id="save-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition">
+            Сохранить
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Certificate Section -->
+    <section class="bg-white rounded-3xl shadow p-6 mb-8">
+      <h3 class="text-xl font-semibold mb-4">Сертификат</h3>
+      <button id="cert-toggle" class="px-6 py-2 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition">
+        Получить сертификат
+      </button>
+
+      <!-- Certificate Form -->
+      <div id="cert-form" class="hidden mt-6">
+        <form id="cert-request" class="space-y-4 mb-6">
+          <div>
+            <label class="block text-sm font-medium mb-1">ФИО</label>
+            <input id="cert-fullname" type="text" placeholder="Иванов Иван Иванович"
+                   class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+          </div>
+          <div class="flex justify-end">
+            <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition">
+              Показать сертификат
+            </button>
+          </div>
+        </form>
+        <!-- Certificate Image -->
+        <div id="cert-result" class="hidden text-center">
+          <img src="https://marketplace.canva.com/EAEndahXe_Y/1/0/1600w/canva-%D0%BD%D0%B5%D0%B6%D0%BD%D1%8B%D0%B9-%D0%B1%D0%B5%D0%B6%D0%B5%D0%B2%D1%8B%D0%B9-%D0%BF%D0%BE%D0%B4%D0%B0%D1%80%D0%BE%D1%87%D0%BD%D1%8B%D0%B9-%D1%81%D0%B5%D1%80%D1%82%D0%B8%D1%84%D0%B8%D0%BA%D0%B0%D1%82-CCmKqVsTLYQ.jpg"
+               alt="Сертификат" class="mx-auto rounded-lg shadow-lg max-w-full h-auto"/>
+        </div>
+      </div>
+    </section>
+
+    <!-- Additional Section -->
+    <section class="bg-white rounded-3xl shadow p-6">
+      <h3 class="text-xl font-semibold mb-4">Настройки</h3>
+      <button class="px-6 py-2 bg-red-500 text-white rounded-2xl hover:bg-red-600 transition">
+        Выйти
+      </button>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t">
+    <div class="container mx-auto px-6 py-4 text-center text-sm text-gray-600">
+      © 2025 Helpster. Все права защищены.
+    </div>
+  </footer>
+
+  <!-- Bottom Navigation -->
+  <nav class="fixed inset-x-0 bottom-8 flex justify-center pointer-events-none">
+    <div class="bg-white bg-opacity-90 backdrop-blur-lg rounded-full px-8 py-3 flex space-x-8 pointer-events-auto">
+      <!-- Главная (активная всегда подсвечена) -->
+      <a href="{{ url_for('user.dashboard') }}" class="flex flex-col items-center text-gray-600 hover:text-indigo-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        </svg>
+        <span class="text-xs">Главная</span>
+      </a>
+      <!-- Мои события -->
+      <a class="flex flex-col items-center text-gray-600 hover:text-indigo-600" href="#my-events">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <span class="text-xs">Мои события</span>
+      </a>
+      <!-- чатбот -->
+      <a class="flex flex-col items-center text-gray-600 hover:text-indigo-600" href="#chatbot">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 14l9-5-9-5-9 5 9 5zm0 0v7m9-12v5m-18-5v5m18 0l-9 5-9-5"/>
+        </svg>
+        <span class="text-xs">чатбот</span>
+      </a>
+      <!-- Профиль (ссылка на страницу) -->
+      <a href="{{ url_for('user.profile') }}" class="flex flex-col items-center text-gray-600 hover:text-indigo-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5 13a4 4 0 118 0 4 4 0 01-8 0zm0 0v4m0 0h4m-4 0H1"/>
+        </svg>
+        <span class="text-xs">Профиль</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Scripts -->
+  <script>
+    // Toggle edit form
+    document.getElementById('edit-toggle').addEventListener('click', () => {
+      document.getElementById('edit-form').classList.toggle('hidden');
+    });
+    // Save profile data
+    document.getElementById('save-btn').addEventListener('click', () => {
+      const name = document.getElementById('edit-fullname').value;
+      document.getElementById('profile-name').textContent = name;
+      document.getElementById('edit-form').classList.add('hidden');
+    });
+    // Certificate form toggle
+    document.getElementById('cert-toggle').addEventListener('click', () => {
+      document.getElementById('cert-form').classList.toggle('hidden');
+      document.getElementById('cert-result').classList.add('hidden');
+    });
+    // Show certificate
+    document.getElementById('cert-request').addEventListener('submit', e => {
+      e.preventDefault();
+      document.getElementById('cert-result').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
