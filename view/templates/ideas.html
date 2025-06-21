@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Helpster — Идеи</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-6 py-6 flex justify-center">
+      <h1 class="text-3xl font-extrabold text-indigo-600">Helpster — Идеи</h1>
+    </div>
+  </header>
+
+  <!-- Отправка идеи -->
+  <main class="flex-grow container mx-auto px-6 py-10">
+    <section class="bg-white p-6 rounded-3xl shadow-lg mb-8">
+      <h3 class="text-2xl font-semibold mb-4">Отправить идею</h3>
+      <form action="{{ url_for('user.ideas') }}" method="POST" class="space-y-4">
+        <div>
+          <label for="title" class="block text-sm font-medium mb-1">Название идеи</label>
+          <input id="title" name="title" type="text" placeholder="Название вашей идеи"
+            class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+        <div>
+          <label for="message" class="block text-sm font-medium mb-1">Описание идеи</label>
+          <textarea id="message" name="message" placeholder="Подробное описание"
+            class="w-full px-4 py-3 border border-gray-300 rounded-2xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"></textarea>
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-2xl hover:bg-indigo-700 transition">
+          Отправить идею
+        </button>
+      </form>
+    </section>
+
+    <!-- Список идей -->
+    <section class="bg-white p-6 rounded-3xl shadow-lg mb-8">
+      <h3 class="text-2xl font-semibold mb-4">Все идеи</h3>
+      {% for idea in ideas %}
+      <div class="border-b mb-4 pb-4">
+        <h4 class="text-xl font-semibold">{{ idea.title }}</h4>
+        <p class="text-sm text-gray-500">{{ idea.message }}</p>
+        <p class="text-xs text-gray-400">Отправлено {{ idea.created_at.strftime('%d %B %Y, %H:%M') }}</p>
+      </div>
+      {% endfor %}
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t">
+    <div class="container mx-auto px-6 py-4 text-center text-sm text-gray-600">
+      © 2025 Helpster. Все права защищены.
+    </div>
+  </footer>
+
+</body>
+</html>

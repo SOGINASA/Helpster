@@ -1,13 +1,22 @@
 from flask import redirect, render_template, request, session, url_for, Blueprint
-from flask_login import login_required, login_user, logout_user
+from flask_login import current_user, login_required, login_user, logout_user
 from db_models import Admin, db, User
-
-
+import os
+from werkzeug.utils import secure_filename
 
 auth_bp = Blueprint('auth', __name__)
 
+AVATAR_FOLDER = os.path.join('view', 'static', 'uploads', 'avatars')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 
 def login():
+    if current_user.is_authenticated:
+        return redirect('/')
     if request.method == 'POST':
         login = request.form.get('login')
         password = request.form.get('password')
@@ -34,8 +43,8 @@ def login():
 
 # Страница регистрации
 def register():
-
-
+    if current_user.is_authenticated:
+        return redirect('/')
     if request.method == 'POST':
         login = request.form.get('login')
         password = request.form.get('password')
@@ -44,21 +53,37 @@ def register():
         city = request.form.get('city')
         phone = request.form.get('phone')
         iin = request.form.get('iin')
+        avatar = request.files.get('avatar')
 
         existing_user = User.query.filter_by(login=login).first()
         existing_admin = Admin.query.filter_by(login=login).first()
         if existing_user or existing_admin:
             return render_template('register.html', error="Пользователь уже существует")
+        existing_user = User.query.filter_by(iin=iin).first()
+        if existing_user:
+            return render_template('register.html', error="Пользователь с таким ИИН уже существует.")
 
-        # Получение координат города
-        
+        avatar_path = 'uploads/avatars/default.jpg'
+        if avatar and allowed_file(avatar.filename):
+            os.makedirs(AVATAR_FOLDER, exist_ok=True)
+            
+            ext = avatar.filename.rsplit('.', 1)[-1].lower()  # получаем расширение
+            filename = secure_filename(f"{login}.{ext}")      # создаём безопасное имя
+            
+            path = os.path.join(AVATAR_FOLDER, filename)
+            avatar.save(path)
+
+            avatar_path = f"uploads/avatars/{filename}"
+
+
         new_user = User(
             login=login,
             email=email,
             full_name=full_name,
             city=city,
             phone=phone,
-            iin=iin
+            iin=iin,
+            avatar_path=avatar_path
         )
         new_user.set_password(password)
 
@@ -76,32 +101,61 @@ def register():
 
     return render_template('register.html')
 
+
 def register_admin():
+    if current_user.is_authenticated:
+        return redirect('/')
     if request.method == 'POST':
         login = request.form.get('login')
         password = request.form.get('password')
         email = request.form.get('email')
-        
-        # Проверка, существует ли пользователь
+        full_name = request.form.get('full_name')
+        city = request.form.get('city')
+        phone = request.form.get('phone')
+        avatar = request.files.get('avatar')
+
         existing_user = User.query.filter_by(login=login).first()
         existing_admin = Admin.query.filter_by(login=login).first()
         if existing_user or existing_admin:
-            return render_template('register_admin.html')
-        
-        # Создание нового пользователя
-        new_admin = Admin(login=login, email=email)
-        new_admin.set_password(password)
-        
-        db.session.add(new_admin)
-        db.session.commit()
+            return render_template('register.html', error="Пользователь уже существует")
 
-        
+        avatar_path = 'uploads/avatars/default.jpg'
+        if avatar and allowed_file(avatar.filename):
+            os.makedirs(AVATAR_FOLDER, exist_ok=True)
+            
+            ext = avatar.filename.rsplit('.', 1)[-1].lower()  # получаем расширение
+            filename = secure_filename(f"{login}.{ext}")      # создаём безопасное имя
+            
+            path = os.path.join(AVATAR_FOLDER, filename)
+            avatar.save(path)
+
+            avatar_path = f"uploads/avatars/{filename}"
+
+
+        new_admin = Admin(
+            login=login,
+            email=email,
+            full_name=full_name,
+            city=city,
+            phone=phone,
+            avatar_path=avatar_path
+        )
+        new_admin.set_password(password)
+
+        try:
+            db.session.add(new_admin)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return f"Ошибка при регистрации: {str(e)}", 500
+
         login_user(new_admin)
-        session['login'] = login    
+        session['login'] = login
         session['is_admin'] = True
         return redirect('/')
-    
+
     return render_template('register_admin.html')
+
 
 
 # Выход

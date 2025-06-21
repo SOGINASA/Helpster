@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Helpster — Создание мероприятия</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50 text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-sm sticky top-0 z-10">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+        Создание мероприятия
+      </h1>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto px-4 py-6 max-w-4xl">
+    <!-- Event Creation Form -->
+    <div class="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20">
+      <form action="{{ url_for('admin.create_event') }}" method="POST" enctype="multipart/form-data">
+        <!-- Title -->
+        <div class="mb-4">
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Название мероприятия</label>
+          <input type="text" id="title" name="title" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Введите название мероприятия" required />
+        </div>
+        
+        <!-- Category -->
+        <div class="mb-4">
+          <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Категория</label>
+          <select id="category" name="category" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="" disabled selected>Выберите категорию</option>
+            <option value="Экология">🌱 Экология</option>
+            <option value="Животные">🐾 Животные</option>
+            <option value="Социальные">🤝 Социальные инициативы</option>
+          </select>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Описание</label>
+          <textarea id="description" name="description" rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Подробное описание мероприятия"></textarea>
+        </div>
+
+        <!-- Location -->
+        <div class="mb-4">
+          <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Местоположение</label>
+          <input type="text" id="location" name="location" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Адрес мероприятия" />
+        </div>
+
+        <!-- Max Participants -->
+        <div class="mb-4">
+          <label for="max_participants" class="block text-sm font-medium text-gray-700 mb-2">Максимальное количество участников</label>
+          <input type="number" id="max_participants" name="max_participants" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="100" />
+        </div>
+
+        <!-- Date -->
+        <div class="mb-4">
+          <label for="date" class="block text-sm font-medium text-gray-700 mb-2">Дата и время мероприятия</label>
+          <input type="datetime-local" id="date" name="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required />
+        </div>
+
+        <!-- Image -->
+        <div class="mb-4">
+          <label for="image" class="block text-sm font-medium text-gray-700 mb-2">Изображение мероприятия</label>
+          <input required type="file" id="image" name="image" accept="image/*" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+
+        <div>
+
+        <div class="mb-4">
+          <label for="chat_link" class="block text-sm font-medium text-gray-700 mb-2">Ссылка на чат</label>
+          <input type="url" id="chat_link" required name="chat_link" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Введите ссылку на чат" />
+        </div>
+
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end space-x-4">
+          <button type="button" onclick="window.history.back()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors">Отмена</button>
+          <button type="submit" class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200">Создать мероприятие</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t">
+    <div class="container mx-auto px-6 py-4 text-center text-sm text-gray-600">
+      © 2025 Helpster. Все права защищены.
+    </div>
+  </footer>
+
+</body>
+</html>

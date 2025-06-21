@@ -6,6 +6,14 @@ from flask_cors import CORS
 from db_models import Admin, db, User
 from routes import *
 
+UPLOAD_FOLDER = os.path.join('view', 'static', 'uploads')
+AVATAR_FOLDER = os.path.join(UPLOAD_FOLDER, 'avatars')
+EVENTS_FOLDER = os.path.join(UPLOAD_FOLDER, 'events')
+
+def create_upload_folders():
+    os.makedirs(AVATAR_FOLDER, exist_ok=True)
+    os.makedirs(EVENTS_FOLDER, exist_ok=True)
+
 # Инициализация приложения
 app = Flask(
     __name__,
@@ -43,7 +51,7 @@ def load_user(user_id):
 @app.route('/', endpoint='index')
 def index():
     if not current_user.is_authenticated:
-        return redirect('/auth/register')
+        return redirect('/auth/login')
     if session.get('is_admin'):
         return redirect('/admin/dashboard')
     else:
@@ -52,8 +60,11 @@ def index():
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(user_bp, url_prefix='/user')
+app.register_blueprint(admin_bp, url_prefix='/admin')
+app.register_blueprint(chatbot_bp, url_prefix='/api')
 
 if __name__ == '__main__':
+    create_upload_folders()
     with app.app_context():
         db.create_all()
     app.run(debug=True, host='0.0.0.0', port=5000)
