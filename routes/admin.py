@@ -1,7 +1,7 @@
 import datetime
 from flask import flash, jsonify, redirect, render_template, request, url_for, Blueprint
 from flask_login import current_user, login_required
-from db_models import Event, EventParticipant, db, User
+from db_models import Event, EventParticipant, db, User, Complaint
 from werkzeug.utils import secure_filename
 import os
 import babel.dates
@@ -9,7 +9,7 @@ import babel.dates
 admin_bp = Blueprint('admin', __name__)
 
 
-UPLOAD_FOLDER = os.path.join('view', 'static', 'uploads', 'events')
+UPLOAD_FOLDER = '/home/ivanchik322/Helpster/view/static/uploads/events'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -32,6 +32,7 @@ def create_event():
         image = request.files.get('image')
         max_participants = request.form.get('max_participants')
         chat_link = request.form.get('chat_link')
+        points_prize = request.form.get('price')
 
         # Валидация
         if not all([title, date_str, category]):
@@ -67,6 +68,7 @@ def create_event():
             admin_id=current_user.id,
             max_participants=max_participants,
             chat_link = chat_link,
+            points_prize = points_prize
         )
         db.session.add(new_event)
         db.session.commit()
@@ -127,9 +129,9 @@ def admin_dashboard():
     # Получаем все мероприятия
     events = Event.query.all()
 
+
     # Статистика:
-    active_events = Event.query.filter(Event.date == datetime.datetime.utcnow()).count()  # Активные мероприятия
-    completed_events = Event.query.filter(Event.date <= datetime.datetime.utcnow()).count()  # Завершённые мероприятия
+
     average_rating = db.session.query(db.func.avg(EventParticipant.rating)).scalar()  # Средний рейтинг мероприятий
 
     # Список пользователей
@@ -137,10 +139,12 @@ def admin_dashboard():
 
     return render_template('admin_main.html', 
                            events=events,
-                           active_events=active_events,
-                           completed_events=completed_events,
+                           active_events=Event.query.filter_by(ststus="coming").count(),
                            average_rating=average_rating,
-                           users=users)
+                           users=users,
+                           total_users=User.query.count(),
+                           total_compaints=Complaint.query.count()
+                           )
 
 @login_required
 def admin_events():
@@ -165,6 +169,16 @@ def user_statistics():
 def test_create():
     return render_template('test_create.html')
 
+def change_event_status(event_id, new_status):
+    event = Event.query.get_or_404(event_id)
+    event.status = new_status
+
+    if new_status == "completed":
+        for participant in event.participants:
+            participant.points += event.points
+    db.session.commit()
+    return redirect(url_for('admin.admin_events'))
+
 admin_bp.add_url_rule('/events/create', view_func=create_event, methods=['GET', 'POST'])
 admin_bp.add_url_rule('/events/json', view_func=get_events_json, methods=['GET'])
 admin_bp.add_url_rule('/dashboard', view_func=admin_dashboard, methods=['GET'])
@@ -174,3 +188,4 @@ admin_bp.add_url_rule('/statistic', view_func=statistics, methods=['GET'])
 admin_bp.add_url_rule('/messages', view_func=messages, methods=['GET'])
 admin_bp.add_url_rule('/user_statistics', view_func=user_statistics, methods=['GET'])
 admin_bp.add_url_rule('/tests/create', view_func=test_create, methods=['GET'])
+admin_bp.add_url_rule('/events/<int:event_id>/status/<string:new_status>', view_func=lambda event_id, new_status: change_event_status(event_id, new_status), methods=['POST'])

@@ -1,12 +1,12 @@
 import os
-from flask import current_app, flash, redirect, render_template, request, session, url_for, Blueprint
+from flask import current_app, flash, redirect, render_template, request, session, url_for, Blueprint, jsonify
 from flask_login import current_user, login_required, login_user, logout_user
-from db_models import Admin, Complaint, Idea, db, User
+from db_models import Admin, Complaint, Idea, db, User, Event, EventParticipant
 from werkzeug.utils import secure_filename
 
 user_bp = Blueprint('user', __name__)
 
-AVATAR_FOLDER = os.path.join('view', 'static', 'uploads', 'avatars')
+AVATAR_FOLDER = '/home/ivanchik322/Helpster/view/static/uploads/avatars'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -23,7 +23,7 @@ def profile():
     user = current_user
 
     if request.method == 'POST':
-        print("📥 Обновление профиля")
+        # print("📥 Обновление профиля")
         user.email = request.form.get('email')
         user.full_name = request.form.get('full_name')
         user.phone = request.form.get('phone')
@@ -45,7 +45,7 @@ def profile():
 
         try:
             db.session.commit()
-            print("✅ Профиль успешно обновлен")
+            # print("✅ Профиль успешно обновлен")
             flash('Профиль успешно обновлен', 'success')
         except Exception as e:
             print("❌ Ошибка при обновлении профиля:", e)
@@ -54,7 +54,12 @@ def profile():
 
         return redirect(url_for('user.profile'))
 
-    return render_template('profile.html', user=user)
+    lvl = user.points // 100
+    points_left = user.points % 100
+
+    top_users = User.query.order_by(User.points.desc()).limit(3).all()
+
+    return render_template('profile.html', user=user, lvl=lvl, points_left=points_left, top_users=top_users)
 
 
 @login_required
@@ -141,13 +146,69 @@ def complaints():
 
     return render_template('complaints.html', complaints=complaints)
 
+def event_details(event_id):
+    event = Event.query.get_or_404(event_id)
+    return render_template('event_details.html', event=event)
 
+@login_required
+def join_event():
+    data = request.get_json()
+    event_id = data.get('event_id')
+
+    # Проверка, что пользователь уже участвует в событии
+    existing_participant = EventParticipant.query.filter_by(event_id=event_id, user_id=current_user.id).first()
+
+    if existing_participant:
+        # Если пользователь уже участвует, возвращаем успешный ответ
+        return jsonify({'message': 'Вы уже зарегестрированны', 'participants': existing_participant.event.people_come}), 200
+
+    # Добавляем нового участника
+    new_participant = EventParticipant(event_id=event_id, user_id=current_user.id)
+    db.session.add(new_participant)
+    db.session.commit()
+
+    event = Event.query.get(event_id)
+    event.people_come += 1
+    db.session.commit()
+
+    return jsonify({'message': 'Вы успешно зарегестрированны', 'participants': event.people_come}), 200
+
+def create_complaint():
+    violation_type = request.form.get('violationType')
+    organization = request.form.get('organization')
+    description = request.form.get('description')
+    evidence = request.form.get('evidence')
+    incident_date = request.form.get('incidentDate')
+    location = request.form.get('location')
+    
+    # Убедитесь, что обязательные поля заполнены
+    if not violation_type or not description:
+        return render_template('error.html', error_message="Заполните обязательные поля")
+
+    # Создайте объект жалобы
+    new_complaint = Complaint(
+        violationType=violation_type,
+        organization=organization,
+        description=description,
+        evidence=evidence,
+        incidentDate=incident_date,
+        location=location
+    )
+
+    # Сохраняем в базе данных
+    db.session.add(new_complaint)
+    db.session.commit()
+
+    # Перенаправляем на страницу с жалобами
+    return redirect('/')
 
 user_bp.add_url_rule('/dashboard', view_func=dashboard, methods=['GET'])
 user_bp.add_url_rule('/calendar', view_func=calendar, methods=['GET'])
 user_bp.add_url_rule('/profile', view_func=profile, methods=['GET', 'POST'])
 user_bp.add_url_rule('/chatbot', view_func=chatbot, methods=['GET'])
 user_bp.add_url_rule('/education', view_func=education, methods=['GET'])
-
+user_bp.add_url_rule('/complaints', view_func=create_complaint, methods=['POST'])
+user_bp.add_url_rule('/event/<int:event_id>', view_func=lambda event_id: event_details(event_id), methods=['GET'])
 user_bp.add_url_rule('/ideas', view_func=ideas, methods=['GET', 'POST'])
 user_bp.add_url_rule('/complaints', view_func=complaints, methods=['GET', 'POST'])
+user_bp.add_url_rule('/event/join', view_func=join_event, methods=['POST'])

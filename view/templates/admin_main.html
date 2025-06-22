@@ -100,14 +100,7 @@
           Уведомления
         </a>
         
-        <a href="#points" onclick="showSection('points')" class="nav-item flex items-center px-4 py-3 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl font-medium transition-all duration-200">
-          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-          </svg>
-          Баллы участников
-        </a>
-        
-        <a href="#feedback" onclick="showSection('feedback')" class="nav-item flex items-center px-4 py-3 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl font-medium transition-all duration-200">
+        <a href="{{ url_for('admin.admin_complaints') }}" onclick="showSection('feedback')" class="nav-item flex items-center px-4 py-3 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl font-medium transition-all duration-200">
           <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
           </svg>
@@ -124,6 +117,7 @@
           <div>
             <p class="font-medium text-gray-800">{{ current_user.login }}</p>
             <p class="text-sm text-gray-500">{{ current_user.email }}</p>
+            <a href="/auth/logout" class="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg inline-block">Выйти</a>
           </div>
         </div>
       </div>
@@ -164,7 +158,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-gray-600 text-sm font-medium">Активные мероприятия</p>
-                <p class="text-3xl font-bold text-indigo-600 mt-2">24</p>
+                <p class="text-3xl font-bold text-indigo-600 mt-2">{{ active_events }}</p>
               </div>
               <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,17 +166,14 @@
                 </svg>
               </div>
             </div>
-            <div class="flex items-center mt-4 text-sm">
-              <span class="text-green-500 font-medium">+12%</span>
-              <span class="text-gray-500 ml-2">с прошлого месяца</span>
-            </div>
+
           </div>
           
           <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-gray-600 text-sm font-medium">Всего участников</p>
-                <p class="text-3xl font-bold text-green-600 mt-2">1,847</p>
+                <p class="text-3xl font-bold text-green-600 mt-2">{{ total_users }}</p>
               </div>
               <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,17 +181,14 @@
                 </svg>
               </div>
             </div>
-            <div class="flex items-center mt-4 text-sm">
-              <span class="text-green-500 font-medium">+8%</span>
-              <span class="text-gray-500 ml-2">новых участников</span>
-            </div>
+
           </div>
           
           <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-gray-600 text-sm font-medium">Средний рейтинг</p>
-                <p class="text-3xl font-bold text-yellow-600 mt-2">4.8</p>
+                <p class="text-3xl font-bold text-yellow-600 mt-2">{{ average_rating }}</p>
               </div>
               <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,17 +196,13 @@
                 </svg>
               </div>
             </div>
-            <div class="flex items-center mt-4 text-sm">
-              <span class="text-green-500 font-medium">+0.2</span>
-              <span class="text-gray-500 ml-2">за этот месяц</span>
-            </div>
           </div>
           
           <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 hover:shadow-xl transition-all duration-300">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-gray-600 text-sm font-medium">Новые обращения</p>
-                <p class="text-3xl font-bold text-red-600 mt-2">7</p>
+                <p class="text-3xl font-bold text-red-600 mt-2">{{ total_compaints }}</p>
               </div>
               <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
                 <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,18 +227,18 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                 </svg>
               </a>
-              <button onclick="showSection('notifications')" class="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl hover:from-green-600 hover:to-teal-700 transition-all duration-200">
+              <a href="/admin/messages" onclick="showSection('notifications')" class="w-full flex items-center justify-between p-4 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-xl hover:from-green-600 hover:to-teal-700 transition-all duration-200">
                 <span class="font-medium">Отправить уведомление</span>
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"/>
                 </svg>
-              </button>
-              <button onclick="showSection('tests')" class="w-full flex items-center justify-between p-4 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl hover:from-orange-600 hover:to-red-700 transition-all duration-200">
+              </a>
+              <a href="/admin/tests/create" onclick="showSection('tests')" class="w-full flex items-center justify-between p-4 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl hover:from-orange-600 hover:to-red-700 transition-all duration-200">
                 <span class="font-medium">Создать тест</span>
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-              </button>
+              </a>
             </div>
           </div>
           
@@ -350,7 +334,7 @@
       <!-- Tests Section -->
       <div id="tests-section" class="section-content hidden">
         <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20">
-          <h3 class="text-2xl font-semibold mb-6 text-gray-800">Создать тест</h3>
+          <h3 href="{{ url_for('admin.test_create') }}" class="text-2xl font-semibold mb-6 text-gray-800">Создать тест</h3>
           <form class="space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>

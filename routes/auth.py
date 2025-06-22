@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 
 auth_bp = Blueprint('auth', __name__)
 
-AVATAR_FOLDER = os.path.join('view', 'static', 'uploads', 'avatars')
+AVATAR_FOLDER = '/home/ivanchik322/Helpster/view/static/uploads/avatars'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):

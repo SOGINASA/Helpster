@@ -1,38 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const searchInput    = document.getElementById('search-input');
-    const categorySelect = document.getElementById('category-select');
-    const cards          = Array.from(document.querySelectorAll('#events-container .card'));
-  
-    function filterCards() {
-      const term = searchInput.value.trim().toLowerCase();
-      const cat  = categorySelect.value;
-  
-      cards.forEach(card => {
-        const title    = card.dataset.title.toLowerCase();
-        const category = card.dataset.category;
-        const matchText= title.includes(term);
-        const matchCat = !cat || cat === category;
-        card.style.display = (matchText && matchCat) ? 'flex' : 'none';
-      });
-    }
-  
-    searchInput.addEventListener('input', filterCards);
-    categorySelect.addEventListener('change', filterCards);
-  });
-
-document.addEventListener('DOMContentLoaded', () => {
   const eventsContainer = document.getElementById('events-container');
-  const searchInput = document.getElementById('search-input');
-  const categorySelect = document.getElementById('category-select');
+  const searchInput     = document.getElementById('search-input');
+  const categorySelect  = document.getElementById('category-select');
+  let allEvents = [];
 
-  let allEvents = [];  // сюда загрузим данные с API
-
-
+  // Загрузить события с сервера
   async function loadEvents() {
     try {
-      const response = await fetch(`/admin/events/json?user_id=${userId}`);
-      const data = await response.json();
-      allEvents = data.events || [];
+      const res = await fetch(`/admin/events/json?user_id=${userId}`);
+      const json = await res.json();
+      allEvents = json.events || [];
       renderEvents();
     } catch (err) {
       console.error("Ошибка загрузки событий:", err);
@@ -40,10 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Создать и вставить карточку
   function renderEvents() {
     const term = searchInput.value.trim().toLowerCase();
-    const cat = categorySelect.value;
-
+    const cat  = categorySelect.value;
     const filtered = allEvents.filter(ev =>
       ev.title.toLowerCase().includes(term) &&
       (cat === '' || ev.category === cat)
@@ -56,11 +33,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     filtered.forEach(ev => {
-      const div = document.createElement('div');
-      div.className = 'bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col';
-      div.innerHTML = `
+      // Корневой контейнер карточки — делает всю карточку кликабельной
+      console.log(ev);
+      const card = document.createElement('div');
+      card.className = 'bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer flex flex-col';
+      card.onclick = () => window.location.href = `/user/event/${ev.id}`;
+
+      card.innerHTML = `
         <div class="relative">
-          <img src="${ev.img || '/static/default-event.jpg'}" alt="${ev.title}" class="w-full h-48 object-cover"/>
+        <img src="${ev.img}"
+               alt="${ev.title}"
+               class="w-full h-48 object-cover"/>
           <span class="absolute top-3 left-3 bg-indigo-600 text-white text-xs font-bold uppercase py-1 px-3 rounded-full">
             ${ev.category}
           </span>
@@ -78,28 +61,33 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
               </svg>
               <span class="ml-1">${ev.participants}</span>
             </div>
           </div>
-          <button class="mt-auto py-2 rounded-lg ${
-            ev.joined ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-          }" ${ev.joined ? 'disabled' : ''}>
+          <button
+            class="mt-auto py-2 rounded-lg ${ev.joined ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}"
+            ${ev.joined ? 'disabled' : ''}
+            onclick="joinEvent(${ev.id}, this)">
             ${ev.joined ? 'Уже участвуете' : 'Присоединиться'}
           </button>
         </div>
       `;
-      eventsContainer.appendChild(div);
+
+      eventsContainer.appendChild(card);
     });
   }
 
+  // Фильтрация в реальном времени
   searchInput.addEventListener('input', renderEvents);
   categorySelect.addEventListener('change', renderEvents);
 
-  loadEvents();  // начальная загрузка
+  // Стартуем
+  loadEvents();
 });
-
 
   document.addEventListener('DOMContentLoaded', () => {
     const nav = document.querySelector('nav');

@@ -11,8 +11,37 @@
   <!-- Шрифт Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script>
+    // глобальная переменная пользователя
     userId = parseInt("{{ current_user.id }}");
     console.log("User ID:", userId);
+
+    // Функция присоединения к событию — осталась без изменений
+    async function joinEvent(eventId, button) {
+      // чтобы клик по кнопке не спровоцировал переход по карточке
+      event.stopPropagation();
+      if (button.textContent.trim() === 'Уже участвуете') {
+        window.location.href = `/user/event/${eventId}`;
+        return;
+      }
+      try {
+        const response = await fetch('/user/event/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event_id: eventId })
+        });
+        const data = await response.json();
+        if (data.message.includes('успешно')) {
+          button.textContent = 'Уже участвуете';
+          button.disabled = true;
+          alert('Вы успешно присоединились к событию!');
+        } else {
+          alert(data.error || 'Что-то пошло не так');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Ошибка при попытке присоединиться к событию');
+      }
+    }
   </script>
   <style>
     body { 
@@ -117,11 +146,11 @@
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold text-gray-800">Доступные события в вашем городе</h2>
       <div class="flex items-center space-x-4">
-        <!-- Кнопка антикоррупционной инициативы -->
-        <button id="openAnticorruptionModal" 
-                class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg flex items-center space-x-2 text-sm">
+        <button id="openAnticorruptionModal"
+                class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium shadow-md flex items-center space-x-2 text-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
           <span>Сообщить о нарушении</span>
         </button>
@@ -131,87 +160,9 @@
         </div>
       </div>
     </div>
-    
-    <!-- Контейнер для событий с улучшенным дизайном -->
+
     <div id="events-container" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <!-- main.js динамически рендерит сюда карточки -->
-      
-      <!-- Пример карточки события для демонстрации -->
-      <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-        <div class="relative h-48 bg-gradient-to-br from-green-400 to-blue-500 overflow-hidden">
-          <div class="absolute inset-0 bg-black/20"></div>
-          <div class="absolute top-4 left-4">
-            <span class="bg-white/90 backdrop-blur-sm text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-              🌱 Экология
-            </span>
-          </div>
-          <div class="absolute bottom-4 left-4 right-4">
-            <h3 class="text-white font-bold text-lg group-hover:text-yellow-200 transition-colors">
-              Уборка городского парка
-            </h3>
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="flex items-center space-x-2 text-gray-600 mb-3">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-            <span class="text-sm">25 июня, 10:00</span>
-          </div>
-          <div class="flex items-center space-x-2 text-gray-600 mb-4">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            <span class="text-sm">Центральный парк</span>
-          </div>
-          <p class="text-gray-700 text-sm mb-4 line-clamp-2">
-            Присоединяйтесь к экологической акции по уборке городского парка. Сделаем наш город чище вместе!
-          </p>
-          <button class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-2 px-4 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg">
-            Присоединиться
-          </button>
-        </div>
-      </div>
-      
-      <!-- Еще одна пример карточки -->
-      <div class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-        <div class="relative h-48 bg-gradient-to-br from-pink-400 to-red-500 overflow-hidden">
-          <div class="absolute inset-0 bg-black/20"></div>
-          <div class="absolute top-4 left-4">
-            <span class="bg-white/90 backdrop-blur-sm text-pink-700 px-3 py-1 rounded-full text-sm font-medium">
-              🐾 Животные
-            </span>
-          </div>
-          <div class="absolute bottom-4 left-4 right-4">
-            <h3 class="text-white font-bold text-lg group-hover:text-yellow-200 transition-colors">
-              Помощь приюту для животных
-            </h3>
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="flex items-center space-x-2 text-gray-600 mb-3">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-            <span class="text-sm">28 июня, 14:00</span>
-          </div>
-          <div class="flex items-center space-x-2 text-gray-600 mb-4">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            <span class="text-sm">Приют "Верный друг"</span>
-          </div>
-          <p class="text-gray-700 text-sm mb-4 line-clamp-2">
-            Помогите нам ухаживать за животными в приюте: кормление, уборка, прогулки с собаками.
-          </p>
-          <button class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-2 px-4 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg">
-            Присоединиться
-          </button>
-        </div>
-      </div>
-      
+      <!-- JS будет динамически рендерить сюда карточки -->
     </div>
   </main>
 
@@ -239,96 +190,70 @@
           </button>
         </div>
 
-        <form id="anticorruptionForm" class="space-y-6" method="post" action="/user/complaints">
+        <form id="anticorruptionForm" method="POST" action="{{ url_for('user.create_complaint') }}">
           <!-- Тип нарушения -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-3">Тип нарушения</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <label class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
-                <input type="radio" name="violationType" value="corruption" class="text-red-600 focus:ring-red-500">
+                <input type="radio" name="violationType" value="corruption" class="text-red-600 focus:ring-red-500" required>
                 <span class="ml-3 text-sm font-medium">💰 Коррупция</span>
               </label>
               <label class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
-                <input type="radio" name="violationType" value="abuse" class="text-red-600 focus:ring-red-500">
+                <input type="radio" name="violationType" value="abuse" class="text-red-600 focus:ring-red-500" required>
                 <span class="ml-3 text-sm font-medium">⚖️ Злоупотребление</span>
               </label>
               <label class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
-                <input type="radio" name="violationType" value="fraud" class="text-red-600 focus:ring-red-500">
+                <input type="radio" name="violationType" value="fraud" class="text-red-600 focus:ring-red-500" required>
                 <span class="ml-3 text-sm font-medium">🏛️ Мошенничество</span>
               </label>
               <label class="flex items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
-                <input type="radio" name="violationType" value="other" class="text-red-600 focus:ring-red-500">
+                <input type="radio" name="violationType" value="other" class="text-red-600 focus:ring-red-500" required>
                 <span class="ml-3 text-sm font-medium">📋 Другое</span>
               </label>
             </div>
           </div>
-
+        
           <!-- Организация/ведомство -->
           <div>
             <label for="organization" class="block text-sm font-semibold text-gray-700 mb-2">Организация/ведомство</label>
-            <input type="text" id="organization" name="organization" 
-                   placeholder="Укажите название организации"
-                   class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors">
+            <input type="text" id="organization" name="organization" placeholder="Укажите название организации" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors" required>
           </div>
-
+        
           <!-- Описание нарушения -->
           <div>
             <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Описание нарушения</label>
-            <textarea id="description" name="description" rows="4" 
-                      placeholder="Подробно опишите суть нарушения, обстоятельства, участников..."
-                      class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors resize-none"></textarea>
+            <textarea id="description" name="description" rows="4" placeholder="Подробно опишите суть нарушения" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors resize-none" required></textarea>
           </div>
-
+        
           <!-- Доказательства -->
           <div>
             <label for="evidence" class="block text-sm font-semibold text-gray-700 mb-2">Доказательства (опционально)</label>
-            <textarea id="evidence" name="evidence" rows="3" 
-                      placeholder="Документы, свидетели, фото, видео и другие доказательства..."
-                      class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors resize-none"></textarea>
+            <textarea id="evidence" name="evidence" rows="3" placeholder="Документы, свидетели, фото, видео" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors resize-none"></textarea>
           </div>
-
+        
           <!-- Дата инцидента -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label for="incidentDate" class="block text-sm font-semibold text-gray-700 mb-2">Дата инцидента</label>
-              <input type="date" id="incidentDate" name="incidentDate"
-                     class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors">
+              <input type="date" id="incidentDate" name="incidentDate" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors" required>
             </div>
             <div>
               <label for="location" class="block text-sm font-semibold text-gray-700 mb-2">Место происшествия</label>
-              <input type="text" id="location" name="location" 
-                     placeholder="Город, адрес"
-                     class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors">
+              <input type="text" id="location" name="location" placeholder="Город, адрес" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors" required>
             </div>
           </div>
-
-          <!-- Анонимность -->
-          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <div class="flex items-start space-x-3">
-              <div class="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                </svg>
-              </div>
-              <div>
-                <h4 class="font-semibold text-amber-800 text-sm">Конфиденциальность</h4>
-                <p class="text-amber-700 text-sm mt-1">Ваша личность будет защищена. Все данные передаются анонимно и обрабатываются в соответствии с законодательством.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Кнопки -->
+        
           <div class="flex flex-col sm:flex-row gap-4 pt-4">
-            <button type="button" onclick="closeAnticorruptionModal()" 
-                    class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium">
+            <button type="button" onclick="closeAnticorruptionModal()" class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium">
               Отмена
             </button>
-            <button type="submit" 
-                    class="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-colors font-semibold shadow-lg hover:shadow-xl">
+            <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-colors font-semibold shadow-lg hover:shadow-xl">
               Отправить сигнал
             </button>
           </div>
         </form>
+        
       </div>
     </div>
   </div>
@@ -431,48 +356,48 @@
       }
 
       // Обработка отправки формы
-      const form = document.getElementById('anticorruptionForm');
-      if (form) {
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
+    //   const form = document.getElementById('anticorruptionForm');
+    //   if (form) {
+    //     form.addEventListener('submit', function(e) {
+    //       e.preventDefault();
           
-          const formData = new FormData(this);
-          const data = {
-            violationType: formData.get('violationType'),
-            organization: formData.get('organization'),
-            description: formData.get('description'),
-            evidence: formData.get('evidence'),
-            incidentDate: formData.get('incidentDate'),
-            location: formData.get('location'),
-            userId: window.userId || null,
-            timestamp: new Date().toISOString()
-          };
+    //       const formData = new FormData(this);
+    //       const data = {
+    //         violationType: formData.get('violationType'),
+    //         organization: formData.get('organization'),
+    //         description: formData.get('description'),
+    //         evidence: formData.get('evidence'),
+    //         incidentDate: formData.get('incidentDate'),
+    //         location: formData.get('location'),
+    //         userId: window.userId || null,
+    //         timestamp: new Date().toISOString()
+    //       };
 
-          if (!data.violationType || !data.description) {
-            alert('Пожалуйста, заполните обязательные поля: тип нарушения и описание.');
-            return;
-          }
+    //       if (!data.violationType || !data.description) {
+    //         alert('Пожалуйста, заполните обязательные поля: тип нарушения и описание.');
+    //         return;
+    //       }
 
-          console.log('Отправляем данные антикоррупционной инициативы:', data);
+    //       console.log('Отправляем данные антикоррупционной инициативы:', data);
           
-          // Показываем успешное сообщение
-          const notification = document.createElement('div');
-          notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50';
-          notification.innerHTML = `
-            <div class="flex items-center space-x-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-              </svg>
-              <span>Сигнал успешно отправлен</span>
-            </div>
-          `;
+    //       // Показываем успешное сообщение
+    //       const notification = document.createElement('div');
+    //       notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50';
+    //       notification.innerHTML = `
+    //         <div class="flex items-center space-x-2">
+    //           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    //             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+    //           </svg>
+    //           <span>Сигнал успешно отправлен</span>
+    //         </div>
+    //       `;
           
-          document.body.appendChild(notification);
-          setTimeout(() => notification.remove(), 3000);
+    //       document.body.appendChild(notification);
+    //       setTimeout(() => notification.remove(), 3000);
           
-          closeAnticorruptionModal();
-        });
-      }
+    //       closeAnticorruptionModal();
+    //     });
+    //   }
     });
 
     // Закрытие по Escape
