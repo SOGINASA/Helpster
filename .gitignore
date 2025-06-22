@@ -3,3 +3,4 @@ __pycache__
 /instance
 /venv
 /view/static/uploads
+helpster.db

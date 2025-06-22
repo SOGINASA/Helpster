@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 
 user_bp = Blueprint('user', __name__)
 
-AVATAR_FOLDER = os.path.join('view', 'static', 'uploads', 'avatars')
+AVATAR_FOLDER = '/home/ivanchik322/Helpster/view/static/uploads/avatars'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -33,10 +33,10 @@ def profile():
         avatar = request.files.get('avatar')
         if avatar and allowed_file(avatar.filename):
             os.makedirs(AVATAR_FOLDER, exist_ok=True)
-            
+
             ext = avatar.filename.rsplit('.', 1)[-1].lower()  # получаем расширение
             filename = secure_filename(f"{user.login}.{ext}")      # создаём безопасное имя
-            
+
             path = os.path.join(AVATAR_FOLDER, filename)
             avatar.save(path)
 
@@ -93,7 +93,7 @@ def ideas():
         except Exception as e:
             db.session.rollback()
             flash(f'Ошибка при отправке идеи: {str(e)}', 'danger')
-        
+
         return redirect(url_for('user.ideas'))  # Перенаправляем обратно на страницу
 
     # Получаем все идеи из базы данных

@@ -9,7 +9,7 @@ import babel.dates
 admin_bp = Blueprint('admin', __name__)
 
 
-UPLOAD_FOLDER = os.path.join('view', 'static', 'uploads', 'events')
+UPLOAD_FOLDER ='/home/ivanchik322/Helpster/view/static/uploads/events'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -23,7 +23,7 @@ def create_event():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        
+
         title = request.form.get('title')
         description = request.form.get('description')
         location = request.form.get('location')
@@ -135,7 +135,7 @@ def admin_dashboard():
     # Список пользователей
     users = User.query.all()
 
-    return render_template('admin_main.html', 
+    return render_template('admin_main.html',
                            events=events,
                            active_events=active_events,
                            completed_events=completed_events,
