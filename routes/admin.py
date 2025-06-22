@@ -23,7 +23,7 @@ def create_event():
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        
+
         title = request.form.get('title')
         description = request.form.get('description')
         location = request.form.get('location')
@@ -137,7 +137,7 @@ def admin_dashboard():
     # Список пользователей
     users = User.query.all()
 
-    return render_template('admin_main.html', 
+    return render_template('admin_main.html',
                            events=events,
                            active_events=Event.query.filter_by(ststus="coming").count(),
                            average_rating=average_rating,
