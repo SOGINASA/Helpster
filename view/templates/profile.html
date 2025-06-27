@@ -21,6 +21,55 @@
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
+    /* Анимация для прогресс-бара */
+.progress-bar {
+  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Пульсация для текущего уровня */
+.level-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Градиент для прогресс-бара с блеском */
+.progress-gradient {
+  background: linear-gradient(90deg, 
+    #6366f1 0%, 
+    #8b5cf6 25%, 
+    #a855f7 50%, 
+    #c084fc 75%, 
+    #e879f9 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-gradient::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255,255,255,0.4) 50%, 
+    transparent 100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50 text-gray-800 font-['Inter',sans-serif]">
@@ -50,39 +99,46 @@
     </section>
 
     <!-- Progress Bar (Level) -->
-    <section class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg border border-white/20 p-6 mb-8">
-      <h3 class="text-xl font-semibold mb-4 text-gray-800">Мой уровень</h3>
-      <div class="mb-4">
-        <div class="text-sm font-medium mb-2">Уровень: <span class="text-indigo-600 font-bold">{{ lvl }}</span></div>
-        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-          <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500" style="width: 60%"></div>
-        </div>
+<section class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg border border-white/20 p-6 mb-8">
+  <h3 class="text-xl font-semibold mb-4 text-gray-800">Мой уровень</h3>
+  <div class="mb-4">
+    <div class="flex justify-between items-center mb-3">
+      <div class="text-sm font-medium">
+        Уровень: <span class="text-indigo-600 font-bold text-lg level-pulse">{{ lvl }}</span>
       </div>
-      <div class="text-xs text-gray-500">Требуется {{ points_left }} баллов для следующего уровня</div>
-    </section>
+      <div class="text-sm font-medium text-gray-600">
+        {{ user.points|default(0) }} / {{ (lvl * 100)|default(100) }} XP
+      </div>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
+      <div class="progress-gradient progress-bar h-4 rounded-full" 
+           style="width: {{ ((user.points|default(0) % 100) / 100 * 100)|round(1) }}%"
+           data-progress="{{ ((user.points|default(0) % 100) / 100 * 100)|round(1) }}">
+      </div>
+    </div>
+  </div>
+  <div class="flex justify-between text-xs">
+    <span class="text-gray-500">
+      Осталось: <strong class="text-indigo-600">{{ points_left|default(0) }}</strong> XP
+    </span>
+    <span class="text-gray-500">
+      Следующий уровень: <strong class="text-purple-600">{{ lvl + 1 }}</strong>
+    </span>
+  </div>
+</section>
 
     <!-- Badge / Medals Section -->
     <section class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg border border-white/20 p-6 mb-8">
       <h3 class="text-xl font-semibold mb-4 text-gray-800">Мои значки</h3>
       <div class="grid grid-cols-3 gap-4">
-        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-4 text-center border border-yellow-200/50 hover:shadow-md transition-all duration-200">
-          <div class="w-12 h-12 mx-auto mb-2 bg-yellow-400 rounded-full flex items-center justify-center text-white text-lg font-bold">
-            🏆
-          </div>
-          <div class="text-sm font-medium text-gray-700">Сертификат новичка</div>
-        </div>
-        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 text-center border border-green-200/50 hover:shadow-md transition-all duration-200">
-          <div class="w-12 h-12 mx-auto mb-2 bg-green-400 rounded-full flex items-center justify-center text-white text-lg font-bold">
-            ⭐
-          </div>
-          <div class="text-sm font-medium text-gray-700">Активный волонтер</div>
-        </div>
+        {% for achivement in achievements %}
         <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 text-center border border-blue-200/50 hover:shadow-md transition-all duration-200">
           <div class="w-12 h-12 mx-auto mb-2 bg-blue-400 rounded-full flex items-center justify-center text-white text-lg font-bold">
             👑
           </div>
-          <div class="text-sm font-medium text-gray-700">Лучший организатор</div>
+          <div class="text-sm font-medium text-gray-700">{{ achivement }}</div>
         </div>
+        {% endfor %}
       </div>
     </section>
 
@@ -323,6 +379,16 @@
         });
       }
     });
+    // Анимация прогресс-бара при загрузке
+const progressBar = document.querySelector('.progress-bar');
+if (progressBar) {
+  const targetWidth = progressBar.getAttribute('data-progress') + '%';
+  progressBar.style.width = '0%';
+  
+  setTimeout(() => {
+    progressBar.style.width = targetWidth;
+  }, 500);
+}
   </script>
 </body>
 </html>

@@ -183,7 +183,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-blue-100 text-sm">Всего мероприятий</p>
-              <p class="text-3xl font-bold">127</p>
+              <p class="text-3xl font-bold">{{ total_events }}</p>
             </div>
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +201,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-green-100 text-sm">Всего участников</p>
-              <p class="text-3xl font-bold">2,834</p>
+              <p class="text-3xl font-bold">{{ total_users }}</p>
             </div>
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,7 +219,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-purple-100 text-sm">Активные события</p>
-              <p class="text-3xl font-bold">43</p>
+              <p class="text-3xl font-bold">{{ active_events }}</p>
             </div>
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,7 +233,7 @@
           </div>
         </div>
 
-        <div class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white fade-in">
+        <!-- <div class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white fade-in">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-orange-100 text-sm">Средняя посещаемость</p>
@@ -249,7 +249,7 @@
             <span class="text-orange-300 text-sm">↗ +5%</span>
             <span class="text-orange-100 text-sm ml-2">за месяц</span>
           </div>
-        </div>
+        </div> -->
 
       </div>
 
@@ -303,36 +303,37 @@
             </thead>
             <tbody class="divide-y divide-gray-200">
               
+              {% for event in events %}
               <tr class="event-card hover:bg-gray-50/50">
                 <td class="px-6 py-4">
                   <div class="flex items-center">
                     <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                      <span class="text-green-600 font-semibold text-sm">🌱</span>
+                      <span class="text-green-600 font-semibold text-sm">{{ event.id }}</span>
                     </div>
                     <div>
-                      <div class="text-sm font-medium text-gray-900">Экологическая уборка парка</div>
-                      <div class="text-sm text-gray-500">Центральный парк</div>
+                      <div class="text-sm font-medium text-gray-900">{{ event.title }}</div>
+                      <div class="text-sm text-gray-500">{{ event.location }}</div>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Экология
+                    {{ event.category }}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-900">15.06.2025</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ event.date }}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">
                   <div class="flex items-center">
-                    <span class="font-medium">145</span>
-                    <span class="text-gray-500 ml-1">/ 200</span>
+                    <span class="font-medium">{{ event.participants }}</span>
+                    <span class="text-gray-500 ml-1">/ {{ event.max_participants }}</span>
                   </div>
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center">
                     <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                      <div class="progress-bar bg-green-500 h-2 rounded-full" style="width: 73%"></div>
+                      <div class="progress-bar bg-green-500 h-2 rounded-full" style="width: {{ event.progress }}%"></div>
                     </div>
-                    <span class="text-sm text-gray-600">73%</span>
+                    <span class="text-sm text-gray-600">{{ event.progress }}%</span>
                   </div>
                 </td>
                 <td class="px-6 py-4">
@@ -340,322 +341,49 @@
                     <div class="flex text-yellow-400">
                       ★★★★★
                     </div>
-                    <span class="text-sm text-gray-600 ml-2">4.8</span>
+                    <span class="text-sm text-gray-600 ml-2">{{ event.rating }}</span>
                   </div>
                 </td>
                 <td class="px-6 py-4">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Завершено
+                    {{ event.status }}
                   </span>
                 </td>
               </tr>
-
-              <tr class="event-card hover:bg-gray-50/50">
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                      <span class="text-blue-600 font-semibold text-sm">🐾</span>
-                    </div>
-                    <div>
-                      <div class="text-sm font-medium text-gray-900">Помощь приюту для животных</div>
-                      <div class="text-sm text-gray-500">Приют "Лапы помощи"</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Животные
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-900">22.06.2025</td>
-                <td class="px-6 py-4 text-sm text-gray-900">
-                  <div class="flex items-center">
-                    <span class="font-medium">89</span>
-                    <span class="text-gray-500 ml-1">/ 120</span>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                      <div class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 74%"></div>
-                    </div>
-                    <span class="text-sm text-gray-600">74%</span>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="flex text-yellow-400">
-                      ★★★★☆
-                    </div>
-                    <span class="text-sm text-gray-600 ml-2">4.6</span>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Активно
-                  </span>
-                </td>
-              </tr>
-
-              <tr class="event-card hover:bg-gray-50/50">
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                      <span class="text-purple-600 font-semibold text-sm">🤝</span>
-                    </div>
-                    <div>
-                      <div class="text-sm font-medium text-gray-900">Благотворительный марафон</div>
-                      <div class="text-sm text-gray-500">Городская площадь</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                    Социальные
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-900">28.06.2025</td>
-                <td class="px-6 py-4 text-sm text-gray-900">
-                  <div class="flex items-center">
-                    <span class="font-medium">324</span>
-                    <span class="text-gray-500 ml-1">/ 500</span>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                      <div class="progress-bar bg-purple-500 h-2 rounded-full" style="width: 65%"></div>
-                    </div>
-                    <span class="text-sm text-gray-600">65%</span>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="flex text-yellow-400">
-                      ★★★★★
-                    </div>
-                    <span class="text-sm text-gray-600 ml-2">4.9</span>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        Планируется
-                      </span>
-                    </td>
-                  </tr>
-    
-                  <tr class="event-card hover:bg-gray-50/50">
-                    <td class="px-6 py-4">
-                      <div class="flex items-center">
-                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-                          <span class="text-red-600 font-semibold text-sm">💊</span>
-                        </div>
-                        <div>
-                          <div class="text-sm font-medium text-gray-900">Донорская акция</div>
-                          <div class="text-sm text-gray-500">Медицинский центр</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        Здоровье
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-900">02.07.2025</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">
-                      <div class="flex items-center">
-                        <span class="font-medium">67</span>
-                        <span class="text-gray-500 ml-1">/ 80</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <div class="flex items-center">
-                        <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                          <div class="progress-bar bg-red-500 h-2 rounded-full" style="width: 84%"></div>
-                        </div>
-                        <span class="text-sm text-gray-600">84%</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <div class="flex items-center">
-                        <div class="flex text-yellow-400">
-                          ★★★★★
-                        </div>
-                        <span class="text-sm text-gray-600 ml-2">4.7</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Завершено
-                      </span>
-                    </td>
-                  </tr>
-    
-                  <tr class="event-card hover:bg-gray-50/50">
-                    <td class="px-6 py-4">
-                      <div class="flex items-center">
-                        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
-                          <span class="text-indigo-600 font-semibold text-sm">📚</span>
-                        </div>
-                        <div>
-                          <div class="text-sm font-medium text-gray-900">Обучающий семинар</div>
-                          <div class="text-sm text-gray-500">Онлайн</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                        Образование
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-900">05.07.2025</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">
-                      <div class="flex items-center">
-                        <span class="font-medium">156</span>
-                        <span class="text-gray-500 ml-1">/ 300</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <div class="flex items-center">
-                        <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                          <div class="progress-bar bg-indigo-500 h-2 rounded-full" style="width: 52%"></div>
-                        </div>
-                        <span class="text-sm text-gray-600">52%</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <div class="flex items-center">
-                        <div class="flex text-yellow-400">
-                          ★★★★☆
-                        </div>
-                        <span class="text-sm text-gray-600 ml-2">4.4</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4">
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        Активно
-                      </span>
-                    </td>
-                  </tr>
-    
+              {% endfor %}
                 </tbody>
               </table>
             </div>
-    
-            <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-200">
-              <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-700">
-                  Показано <span class="font-medium">1-5</span> из <span class="font-medium">127</span> результатов
-                </div>
-                <div class="flex items-center space-x-2">
-                  <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50" disabled>
-                    Назад
-                  </button>
-                  <button class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg hover:bg-indigo-700">
-                    1
-                  </button>
-                  <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                    2
-                  </button>
-                  <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                    3
-                  </button>
-                  <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                    Далее
-                  </button>
-                </div>
-              </div>
-            </div>
-    
           </div>
     
           <!-- Additional Stats Section -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
             
-            <!-- Top Participants -->
+            <!-- Топ участников -->
             <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 fade-in">
               <h3 class="text-lg font-semibold text-gray-800 mb-4">Топ участников</h3>
               <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mr-3">
-                      <span class="text-white font-bold text-xs">1</span>
+                {% if top_users %}
+                  {% for participant in top_users  %}
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center">
+                        <div class="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mr-3">
+                          <span class="text-white font-bold text-xs">{{ loop.index }}</span>
+                        </div>
+                        <div>
+                          <p class="font-medium text-gray-900">{{ participant.full_name }}</p>
+                          <p class="text-sm text-gray-500">{{ participant.points }} баллов</p>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p class="font-medium text-gray-900">Анна Петрова</p>
-                      <p class="text-sm text-gray-500">24 мероприятия</p>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <p class="font-semibold text-indigo-600">2,340 баллов</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center mr-3">
-                      <span class="text-white font-bold text-xs">2</span>
-                    </div>
-                    <div>
-                      <p class="font-medium text-gray-900">Михаил Иванов</p>
-                      <p class="text-sm text-gray-500">19 мероприятий</p>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <p class="font-semibold text-indigo-600">1,890 баллов</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mr-3">
-                      <span class="text-white font-bold text-xs">3</span>
-                    </div>
-                    <div>
-                      <p class="font-medium text-gray-900">Елена Смирнова</p>
-                      <p class="text-sm text-gray-500">17 мероприятий</p>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <p class="font-semibold text-indigo-600">1,670 баллов</p>
-                  </div>
-                </div>
+                  {% endfor %}
+                {% else %}
+                  <p>Нет данных для отображения.</p>
+                {% endif %}
               </div>
             </div>
-    
-            <!-- Recent Activity -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 fade-in">
-              <h3 class="text-lg font-semibold text-gray-800 mb-4">Последняя активность</h3>
-              <div class="space-y-4">
-                <div class="flex items-start">
-                  <div class="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3"></div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-900">Новая регистрация</p>
-                    <p class="text-xs text-gray-500">Дмитрий К. зарегистрировался на "Экологическую уборку"</p>
-                    <p class="text-xs text-gray-400 mt-1">2 минуты назад</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start">
-                  <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3"></div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-900">Завершение мероприятия</p>
-                    <p class="text-xs text-gray-500">"Помощь приюту" завершилось с рейтингом 4.8</p>
-                    <p class="text-xs text-gray-400 mt-1">15 минут назад</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start">
-                  <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3"></div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-900">Новое мероприятие</p>
-                    <p class="text-xs text-gray-500">Создано "Благотворительный концерт"</p>
-                    <p class="text-xs text-gray-400 mt-1">1 час назад</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+
     
             <!-- Quick Actions -->
             <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 fade-in">
@@ -738,15 +466,16 @@
           new Chart(categoryCtx, {
             type: 'doughnut',
             data: {
-              labels: ['Экология', 'Животные', 'Социальные', 'Здоровье', 'Образование'],
+              labels: ['Экология', 'Животные', 'Социальные', 'рейды', 'лекции', 'флэшмобы'],
               datasets: [{
-                data: [32, 24, 28, 12, 4],
+                data: [{{eco_events}}, {{animals_events}}, {{social_events}}, {{raids_events}}, {{lectures_events}}, {{flashmobs_events}}],
                 backgroundColor: [
                   '#10b981',
                   '#3b82f6',
                   '#8b5cf6',
                   '#ef4444',
-                  '#6366f1'
+                  '#6366f1',
+                  '#f59e0b'
                 ],
                 borderWidth: 0
               }]
@@ -785,3 +514,7 @@
     
     </body>
     </html>
+
+
+
+    

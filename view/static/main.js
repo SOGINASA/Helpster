@@ -65,12 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
               </svg>
-              <span class="ml-1">${ev.participants}</span>
+              <span class="ml-1">${ev.participants}/${ev.max_participants}</span>
             </div>
           </div>
           <button
-            class="mt-auto py-2 rounded-lg ${ev.joined ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}"
-            ${ev.joined ? 'disabled' : ''}
+            class="mt-auto py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white"
             onclick="joinEvent(${ev.id}, this)">
             ${ev.joined ? 'Уже участвуете' : 'Присоединиться'}
           </button>

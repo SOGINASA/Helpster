@@ -32,7 +32,7 @@ def login():
             session['login'] = login
             session['is_admin'] = True
             return redirect('/')
-
+        
         if user and user.check_password(password):
             login_user(user)
             session['login'] = login
@@ -40,7 +40,7 @@ def login():
             return redirect('/')
         else:
             return render_template('login.html', error="Неверное имя пользователя или пароль")
-
+    
     return render_template('login.html')
 
 # Страница регистрации
@@ -65,17 +65,17 @@ def register():
         if existing_user:
             return render_template('register.html', error="Пользователь с таким ИИН уже существует.")
 
-
-        os.makedirs(AVATAR_FOLDER, exist_ok=True)
         avatar_path = 'uploads/avatars/default.jpg'
         if avatar and allowed_file(avatar.filename):
             os.makedirs(AVATAR_FOLDER, exist_ok=True)
-
+            
             ext = avatar.filename.rsplit('.', 1)[-1].lower()  # получаем расширение
-            filename = secure_filename(f"{login}.{ext}")
+            filename = secure_filename(f"{login}.{ext}")      # создаём безопасное имя
+            
             path = os.path.join(AVATAR_FOLDER, filename)
             avatar.save(path)
 
+            avatar_path = f"uploads/avatars/{filename}"
 
 
         new_user = User(
@@ -124,10 +124,10 @@ def register_admin():
         avatar_path = 'uploads/avatars/default.jpg'
         if avatar and allowed_file(avatar.filename):
             os.makedirs(AVATAR_FOLDER, exist_ok=True)
-
+            
             ext = avatar.filename.rsplit('.', 1)[-1].lower()  # получаем расширение
             filename = secure_filename(f"{login}.{ext}")      # создаём безопасное имя
-
+            
             path = os.path.join(AVATAR_FOLDER, filename)
             avatar.save(path)
 

@@ -33,9 +33,9 @@
         if (data.message.includes('успешно')) {
           button.textContent = 'Уже участвуете';
           button.disabled = true;
-          alert('Вы успешно присоединились к событию!');
+          // alert('Вы успешно присоединились к событию!');
         } else {
-          alert(data.error || 'Что-то пошло не так');
+          alert(data.error || data.message);
         }
       } catch (error) {
         console.error(error);
@@ -96,6 +96,24 @@
       transform: translateY(-2px);
       box-shadow: 0 12px 40px rgba(239, 68, 68, 0.4);
     }
+
+    .voice-wave {
+      animation: wave 0.5s ease-in-out infinite alternate;
+    }
+    
+    @keyframes wave {
+      from { height: 4px; }
+      to { height: 16px; }
+    }
+    
+    .pulse-recording {
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50 text-gray-800 font-['Inter',sans-serif]">
@@ -124,6 +142,9 @@
             <option value="Экология">🌱 Экология</option>
             <option value="Животные">🐾 Животные</option>
             <option value="Социальные">🤝 Социальные инициативы</option>
+            <option value="рейды">антикор рейды</option>
+            <option value="лекции">лекции про коррупцию</option>
+            <option value="флэшмобы">антикор флэшмобы</option>
           </select>
           <svg xmlns="http://www.w3.org/2000/svg"
                class="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-indigo-400 pointer-events-none"
@@ -220,11 +241,36 @@
             <input type="text" id="organization" name="organization" placeholder="Укажите название организации" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors" required>
           </div>
         
-          <!-- Описание нарушения -->
           <div>
             <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Описание нарушения</label>
-            <textarea id="description" name="description" rows="4" placeholder="Подробно опишите суть нарушения" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors resize-none" required></textarea>
-          </div>
+            <div class="relative">
+              <textarea id="description" name="description" rows="4" placeholder="Подробно опишите суть нарушения или нажмите на микрофон для голосового ввода" class="w-full px-4 py-3 pr-16 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors resize-none" required></textarea>
+              
+              <!-- Кнопка голосового ввода -->
+              <button type="button" id="voiceInputBtn" class="absolute right-3 top-3 p-2 rounded-lg bg-red-50 hover:bg-red-100 transition-colors" title="Голосовой ввод">
+                <svg id="micIcon" class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0m14 0a7 7 0 00-14 0m14 0v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4m14 0V9a7 7 0 00-14 0v2"></path>
+                </svg>
+                <svg id="micOffIcon" class="w-5 h-5 text-red-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 5.586A2 2 0 017 5h1a2 2 0 012 2v1m0 0v1a2 2 0 11-4 0V8a2 2 0 114 0zM12 19l9 2-9-2zM12 19l-9 2 9-2zm0 0v-8a2 2 0 114 0v8a2 2 0 11-4 0z"></path>
+                </svg>
+              </button>
+              
+              <!-- Индикатор записи -->
+              <div id="recordingIndicator" class="absolute right-16 top-3 hidden">
+                <div class="flex items-center space-x-1">
+                  <div class="w-1 h-4 bg-red-500 rounded voice-wave"></div>
+                  <div class="w-1 h-2 bg-red-400 rounded voice-wave" style="animation-delay: 0.1s"></div>
+                  <div class="w-1 h-3 bg-red-300 rounded voice-wave" style="animation-delay: 0.2s"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Статус голосового ввода -->
+            <div id="voiceStatus" class="mt-2 text-sm text-gray-600 hidden">
+              <span id="voiceStatusText">Нажмите на микрофон и начните говорить...</span>
+            </div>
+          </div>          
         
           <!-- Доказательства -->
           <div>
@@ -338,6 +384,9 @@
       const modal = document.getElementById('anticorruptionModal');
       modal.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
+      
+      // Инициализируем голосовой ввод после открытия модального окна
+      setupVoiceInput();
     }
 
     function closeAnticorruptionModal() {
@@ -409,6 +458,167 @@
         }
       }
     });
+// Глобальные переменные для голосового ввода
+let recognition;
+let isRecording = false;
+
+// Функция инициализации голосового ввода
+function initVoiceInput() {
+  // Проверяем поддержку Web Speech API
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    const voiceBtn = document.getElementById('voiceInputBtn');
+    if (voiceBtn) voiceBtn.style.display = 'none';
+    console.warn('Web Speech API не поддерживается в этом браузере');
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'ru-RU';
+  
+  // Получаем элементы после открытия модального окна
+  const voiceBtn = document.getElementById('voiceInputBtn');
+  const descriptionField = document.getElementById('description');
+  const micIcon = document.getElementById('micIcon');
+  const micOffIcon = document.getElementById('micOffIcon');
+  const recordingIndicator = document.getElementById('recordingIndicator');
+  const voiceStatus = document.getElementById('voiceStatus');
+  const voiceStatusText = document.getElementById('voiceStatusText');
+  
+  // Проверяем что все элементы найдены
+  if (!voiceBtn || !descriptionField) {
+    console.error('Не найдены элементы для голосового ввода');
+    return;
+  }
+  
+  // Добавляем обработчик клика
+  voiceBtn.addEventListener('click', function() {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  });
+  
+  function startRecording() {
+    try {
+      recognition.start();
+      isRecording = true;
+      
+      // Обновляем UI
+      voiceBtn.classList.add('pulse-recording', 'bg-red-200');
+      micIcon.classList.add('hidden');
+      micOffIcon.classList.remove('hidden');
+      recordingIndicator.classList.remove('hidden');
+      voiceStatus.classList.remove('hidden');
+      voiceStatusText.textContent = 'Говорите... Нажмите снова для остановки';
+      
+    } catch (error) {
+      console.error('Ошибка при запуске записи:', error);
+      showVoiceError('Не удалось запустить запись голоса');
+    }
+  }
+  
+  function stopRecording() {
+    recognition.stop();
+    isRecording = false;
+    
+    // Обновляем UI
+    voiceBtn.classList.remove('pulse-recording', 'bg-red-200');
+    micIcon.classList.remove('hidden');
+    micOffIcon.classList.add('hidden');
+    recordingIndicator.classList.add('hidden');
+    voiceStatus.classList.add('hidden');
+  }
+  
+  recognition.onresult = function(event) {
+    // Проверяем что элемент еще существует
+    const descriptionField = document.getElementById('description');
+    const voiceStatusText = document.getElementById('voiceStatusText');
+    
+    if (!descriptionField) return;
+    
+    let finalTranscript = '';
+    let interimTranscript = '';
+    
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript;
+      } else {
+        interimTranscript += transcript;
+      }
+    }
+    
+    // Обновляем поле с текстом
+    const currentText = descriptionField.value;
+    if (finalTranscript) {
+      // Добавляем финальный текст к существующему
+      descriptionField.value = currentText + (currentText ? ' ' : '') + finalTranscript;
+    }
+    
+    // Показываем промежуточный результат в статусе
+    if (interimTranscript && voiceStatusText) {
+      voiceStatusText.textContent = 'Распознается: ' + interimTranscript;
+    }
+  };
+  
+  recognition.onerror = function(event) {
+    console.error('Ошибка распознавания речи:', event.error);
+    stopRecording();
+    
+    let errorMessage = 'Ошибка распознавания речи';
+    switch (event.error) {
+      case 'no-speech':
+        errorMessage = 'Речь не обнаружена. Попробуйте еще раз.';
+        break;
+      case 'audio-capture':
+        errorMessage = 'Нет доступа к микрофону';
+        break;
+      case 'not-allowed':
+        errorMessage = 'Доступ к микрофону запрещен';
+        break;
+      case 'network':
+        errorMessage = 'Ошибка сети. Проверьте подключение к интернету.';
+        break;
+    }
+    
+    showVoiceError(errorMessage);
+  };
+  
+  recognition.onend = function() {
+    if (isRecording) {
+      stopRecording();
+    }
+  };
+  
+  function showVoiceError(message) {
+    const voiceStatus = document.getElementById('voiceStatus');
+    const voiceStatusText = document.getElementById('voiceStatusText');
+    
+    if (voiceStatus && voiceStatusText) {
+      voiceStatus.classList.remove('hidden');
+      voiceStatusText.textContent = message;
+      voiceStatusText.classList.add('text-red-600');
+      
+      setTimeout(() => {
+        voiceStatus.classList.add('hidden');
+        voiceStatusText.classList.remove('text-red-600');
+      }, 3000);
+    }
+  }
+}
+
+// Функция для вызова при открытии модального окна
+function setupVoiceInput() {
+  // Небольшая задержка чтобы убедиться что DOM обновился
+  setTimeout(() => {
+    initVoiceInput();
+  }, 100);
+}
   </script>
 </body>
 </html>

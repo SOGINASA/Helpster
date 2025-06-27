@@ -33,10 +33,10 @@ def profile():
         avatar = request.files.get('avatar')
         if avatar and allowed_file(avatar.filename):
             os.makedirs(AVATAR_FOLDER, exist_ok=True)
-
+            
             ext = avatar.filename.rsplit('.', 1)[-1].lower()  # получаем расширение
             filename = secure_filename(f"{user.login}.{ext}")      # создаём безопасное имя
-
+            
             path = os.path.join(AVATAR_FOLDER, filename)
             avatar.save(path)
 
@@ -57,9 +57,11 @@ def profile():
     lvl = user.points // 100
     points_left = user.points % 100
 
+    achievements = user.achievements.split(', ') if user.achievements else []
+
     top_users = User.query.order_by(User.points.desc()).limit(3).all()
 
-    return render_template('profile.html', user=user, lvl=lvl, points_left=points_left, top_users=top_users)
+    return render_template('profile.html', user=user, lvl=lvl, points_left=points_left, top_users=top_users, achievements=achievements)
 
 
 @login_required
@@ -98,7 +100,7 @@ def ideas():
         except Exception as e:
             db.session.rollback()
             flash(f'Ошибка при отправке идеи: {str(e)}', 'danger')
-
+        
         return redirect(url_for('user.ideas'))  # Перенаправляем обратно на страницу
 
     # Получаем все идеи из базы данных
@@ -152,26 +154,41 @@ def event_details(event_id):
 
 @login_required
 def join_event():
+    # Получаем данные из запроса
     data = request.get_json()
     event_id = data.get('event_id')
+
+    # Получаем событие по ID
+    event = Event.query.get(event_id)
+
+    # Проверяем, существует ли событие
+    if not event:
+        return jsonify({'message': 'Событие не найдено'}), 404
 
     # Проверка, что пользователь уже участвует в событии
     existing_participant = EventParticipant.query.filter_by(event_id=event_id, user_id=current_user.id).first()
 
     if existing_participant:
         # Если пользователь уже участвует, возвращаем успешный ответ
-        return jsonify({'message': 'Вы уже зарегестрированны', 'participants': existing_participant.event.people_come}), 200
+        return jsonify({'message': 'Вы уже зарегистрированы', 'participants': event.people_come}), 200
+
+    # Проверка, что событие не заполнено
+    if event.people_come >= event.max_participants:
+        return jsonify({'message': 'Событие заполнено', 'participants': event.people_come}), 200
+
+    # Проверка статуса события
+    if event.status == 'completed' or event.status == 'active':
+        return jsonify({'message': 'Событие завершено или активно', 'participants': event.people_come}), 200
 
     # Добавляем нового участника
     new_participant = EventParticipant(event_id=event_id, user_id=current_user.id)
     db.session.add(new_participant)
-    db.session.commit()
 
-    event = Event.query.get(event_id)
+    # Обновляем количество участников
     event.people_come += 1
     db.session.commit()
 
-    return jsonify({'message': 'Вы успешно зарегестрированны', 'participants': event.people_come}), 200
+    return jsonify({'message': 'Вы успешно зарегистрированы', 'participants': event.people_come}), 200
 
 def create_complaint():
     violation_type = request.form.get('violationType')

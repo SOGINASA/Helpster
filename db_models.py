@@ -19,7 +19,7 @@ class User(UserMixin, db.Model):
     iin = db.Column(db.String(12), unique=True, nullable=False)
     points = db.Column(db.Integer, default=0)
     achievements = db.Column(db.Text, default="")
-    avatar_path = db.Column(db.String(255), nullable=True)
+    avatar_path = db.Column(db.String(255), nullable=True, default="uploads/avatars/default.jpg")
     event_associations = db.relationship('EventParticipant', back_populates='user')
 
     is_admin = False
@@ -32,6 +32,14 @@ class User(UserMixin, db.Model):
     
     def get_id(self):
         return f"user:{self.login}"
+
+    def add_achievement(self, achievement_name):
+        # Добавление новой ачивки в строку achievements
+        if self.achievements:
+            self.achievements += f", {achievement_name}"
+        else:
+            self.achievements = achievement_name
+        db.session.commit()
 
 class Admin(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -75,7 +83,7 @@ class Event(db.Model):
     image_path = db.Column(db.String(200), nullable=True)
     max_participants = db.Column(db.Integer, default=100)
     points_prize = db.Column(db.Integer, default=0)
-    ststus = db.Column(db.String(50), nullable=False, default="coming") # "active" or "completed" or "coming"
+    status = db.Column(db.String(50), nullable=False, default="coming") # "active" or "completed" or "coming"
     people_come = db.Column(db.Integer, default=0)
     chat_link = db.Column(db.String(200), nullable=True)
 
